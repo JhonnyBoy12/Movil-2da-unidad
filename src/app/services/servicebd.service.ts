@@ -9,6 +9,6 @@ export class ServicebdService {
   public database!: SQLiteObject
 
   //variables de creacion de tablas
-  tablaNoticia:  string ="CREATE TABLE noticia(idnoticia INTEGER PRIMARY KEY autoincrement, titulo VARCHAR(100) NOT NULL, texto TEXT NOT NULL);";
+  tablaNoticia:  string ="CREATE TABLE IF NOT EXISTS noticia(idnoticia INTEGER PRIMARY KEY autoincrement, titulo VARCHAR(100) NOT NULL, texto TEXT NOT NULL);";
   constructor() { }
 }
