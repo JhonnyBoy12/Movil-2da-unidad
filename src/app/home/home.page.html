@@ -1,0 +1,18 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Blank
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-item>
+    <ion-input label="Nombre de Variable de Storage" labelPlacement="floating" placeholder="Ingrese un nombre" [(ngModel)]="nombre"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-input label="Valor de variable Storage" labelPlacement="floating" placeholder="Ingrese un valor" [(ngModel)]="valor"></ion-input>
+  </ion-item>
+  <ion-button color="success" (click)="crear()">Crear variable</ion-button>
+  <ion-button color="warning" [routerLink]="['/inicio']">ir pagina inicio</ion-button>
+</ion-content>
