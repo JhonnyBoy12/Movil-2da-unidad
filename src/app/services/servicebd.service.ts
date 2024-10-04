@@ -24,7 +24,7 @@ export class ServicebdService {
   ///variable para manipular el estado de la base de datos
   private isDBReady: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
-  constructor(private sqlite: SQLite, private platform: Platform, private alertController: AlertController) { 
+  constructor(private sqlite: SQlite, private platform: Platform, private alertController: AlertController) { 
     this.crearBD(); ///apenas se llame al servicio automaticamente se cree la BD
   }///platform libreria para verificar si la plataforma del dispisitivo esta lista, proceda a ejecutar
 
@@ -56,12 +56,11 @@ export class ServicebdService {
           ///capturar y guardar la conexion a la base de datos
           this.database = db;
           //llamar a la funcion de creacion de tablas
-
-
-
+          this.crearTablas();
+          this.consultarNoticias();
           //modificar el obersable del status de la base de datos
           this.isDBReady.next(true);
-        }).catch(e=>{
+        }).catch((e: any)=>{
           this.presentAlert("Creacion de BD", "Error creando la BD: " + JSON.stringify (e));
         })
     })
@@ -77,4 +76,50 @@ export class ServicebdService {
       this.presentAlert("Creacion de tablas", "Error creando las tablas: " + JSON.stringify (e));
     }
   }
+  consultarNoticias(){
+    return this.database.executeSql('SELECT * FROM noticia',[]).then(res=>{
+      //crear variable para almacenar el resultado de la consulta
+      let items: Noticias[] = []; // la clase Noticias tiene los atributos
+      //verificar si tenemos registros en la consulta
+      if(res.rows.lenght > 0){
+        //recorro el res
+        for(var i = 0; i < res.rows.lenght; i++){
+          //agregar registro a mi variable
+          items.push({
+             idnoticia: res.rows.item(i).idnoticia, /// nombre de la clase, y nombre d ela base de datos
+             titulo: res.rows.item(i).titulo,
+             texto: res.rows.item(i).texto
+          })
+        }
+      }
+      this.listadoNoticias.next(items as any); //almacenar variables en el observable
+
+    })///executeSql nos sirve para cualquier consulta param 1= sentencia sql, param 2 =, la sentencia se guarda en la variable res asi que hace de cursor 
+  }
+  modificarNoticia(id:string, titulo:string, texto:string){
+    return this.database.executeSql('UPDATE noticia SET titulo = ?, texto = ? WHERE idnoticia = ? ',[titulo,texto,id]).then(res=>{
+      this.presentAlert("Modificar", "Noticia Modificada" );
+      this.consultarNoticias();//? es porque la variable esta en una variable de programacion
+  }).catch(e=>{
+    this.presentAlert("Modificar", "Modificacion no modificada")
+  })
+  
+}
+eliminarNoticia(id:string){
+    return this.database.executeSql('DELETE FROM noticia WHERE idnoticia= ?',[id]).then(res=>{
+      this.presentAlert("Eliminar", "Noticia Eliminar" );
+      this.consultarNoticias();//? es porque la variable esta en una variable de programacion
+  }).catch(e=>{
+    this.presentAlert("Eliminar", "error" + JSON.stringify(e));
+  })
+ }
+ insertarNoticia(titulo:string,texto:string){
+  return this.database.executeSql ('INSERT INTO noticia(titulo,texto) VALUES (?,?)',[titulo,texto]).then(res=>{
+    this.presentAlert("Insertar", "Noticia Guardar" );
+    this.consultarNoticias();//? es porque la variable esta en una variable de programacion
+}).catch(e=>{
+  this.presentAlert("Insertar", "Error" + JSON.stringify(e));
+})
+
+ }
 }
